@@ -654,9 +654,10 @@ func billingReportByCompetitionV2(ctx context.Context, tenantDB dbOrTx, tenantID
 		vhsGroupByCompetitionID[vh.CompetitionID] = append(vhsGroupByCompetitionID[vh.CompetitionID], vh)
 	}
 
+	// NOTE: competitionごとにグルーピングした中でPlayerIDごとにグルーピング
 	billingMapGroupByCompetitionID := map[string]map[string]string{}
 	for competitionID, vhs := range vhsGroupByCompetitionID {
-		billingMapGroupByPlayerID := map[string][]VisitHistorySummaryRowV2{}
+		billingMapGroupByPlayerID := make(map[string][]VisitHistorySummaryRowV2, len(vhs))
 		for _, vh := range vhs {
 			billingMapGroupByPlayerID[vh.PlayerID] = append(billingMapGroupByPlayerID[vh.PlayerID], vh)
 		}
@@ -676,10 +677,16 @@ func billingReportByCompetitionV2(ctx context.Context, tenantDB dbOrTx, tenantID
 				}
 			}
 
-			if comp.FinishedAt.Valid && comp.FinishedAt.Int64 < minCreatedAt {
+			if comp.FinishedAt.Int64 < minCreatedAt {
 				continue
 			}
-			billingMapGroupByCompetitionID[competitionID][playerID] = "visitor"
+			if billingMapGroupByCompetitionID[competitionID] == nil {
+				billingMapGroupByCompetitionID[competitionID] = map[string]string{
+					playerID: "visitor",
+				}
+			} else {
+				billingMapGroupByCompetitionID[competitionID][playerID] = "visitor"
+			}
 		}
 	}
 
@@ -701,9 +708,9 @@ func billingReportByCompetitionV2(ctx context.Context, tenantDB dbOrTx, tenantID
 		); err != nil && err != sql.ErrNoRows {
 			return nil, fmt.Errorf("error Select count player_score: tenantID=%d, competitionID=%s, %w", tenantID, competitionID, err)
 		}
-		for _, pid := range scoredPlayerIDs {
+		for _, playerID := range scoredPlayerIDs {
 			// スコアが登録されている参加者
-			billingMapGroupByCompetitionID[competitionID][pid] = "player"
+			billingMapGroupByCompetitionID[competitionID][playerID] = "player"
 		}
 	}
 
