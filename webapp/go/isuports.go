@@ -133,6 +133,7 @@ func SetCacheControlPrivate(next echo.HandlerFunc) echo.HandlerFunc {
 
 // Run は cmd/isuports/main.go から呼ばれるエントリーポイントです
 func Run() {
+	fmt.Println("isuports server starting...")
 	e := echo.New()
 	e.Debug = true
 	e.Logger.SetLevel(log.DEBUG)
