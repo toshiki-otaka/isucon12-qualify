@@ -4,6 +4,7 @@
 
 ```
 go run cmd/bench/main.go -target-url https://t.isucon.dev
+go run cmd/bench/main.go -target-url http://localhost:3000
 ```
 
 各種オプションは以下を参照してください。

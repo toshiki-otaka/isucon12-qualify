@@ -151,7 +151,7 @@ Resources:
   QualifyInstance1:
     Type: AWS::EC2::Instance
     Properties:
-      ImageId: ami-05c5b59deed48f66b
+      ImageId: ami-073140ad092048333
       InstanceType: c5.large
       SecurityGroupIds:
         - !Ref SecurityGroup
@@ -175,7 +175,7 @@ Resources:
   QualifyInstance2:
     Type: AWS::EC2::Instance
     Properties:
-      ImageId: ami-05c5b59deed48f66b
+      ImageId: ami-073140ad092048333
       InstanceType: c5.large
       SecurityGroupIds:
         - !Ref SecurityGroup
@@ -199,7 +199,7 @@ Resources:
   QualifyInstance3:
     Type: AWS::EC2::Instance
     Properties:
-      ImageId: ami-05c5b59deed48f66b
+      ImageId: ami-073140ad092048333
       InstanceType: c5.large
       SecurityGroupIds:
         - !Ref SecurityGroup
@@ -220,3 +220,27 @@ Resources:
     Properties:
       Domain: vpc
       InstanceId: !Ref QualifyInstance3
+  BenchmarkerInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-073140ad092048333
+      InstanceType: c5.xlarge
+      SecurityGroupIds:
+        - !Ref SecurityGroup
+      SubnetId: !Ref Subnet
+      KeyName: !Ref MyKeyPair
+      PrivateIpAddress: "192.168.0.14"
+      IamInstanceProfile: !Ref InstanceProfile
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: 20
+            VolumeType: gp3
+      Tags:
+        - Key: Name
+          Value: isucon12-benchmarker
+  BenchmarkerInstanceIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      InstanceId: !Ref BenchmarkerInstance
